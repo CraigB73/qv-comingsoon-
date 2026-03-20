@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quote Vector</title>
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #22c55e;
+      --accent-hover: #16a34a;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    header {
+      text-align: center;
+      padding: 4rem 1rem;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .cta {
+      margin-top: 2rem;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #000;
+      padding: 0.9rem 1.6rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .btn:hover {
+      background: var(--accent-hover);
+    }
+
+    section {
+      margin-top: 4rem;
+    }
+    .sub-header {
+      text-align: center;
+    }
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    @media(min-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .card {
+      background: var(--card);
+      padding: 1.5rem;
+      border-radius: 10px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- HERO -->
+    <header>
+      <div style="margin-top:2rem; box-shadow:0 10px 30px rgba(0,0,0,0.4); border-radius:12px; overflow:hidden;">
+          <img src="/images/logo.png" alt="Quote Vector preview" style="width:25%;" />
+      </div>
+      <h1>Quoting made simple</h1>
+      <p class="subtitle">
+        Quote Vector helps tradespeople and contractors create accurate quotes faster — using your own supplier pricing and AI-powered document reading.
+      </p>
+
+      <div class="cta">
+        <a  class="btn">Coming Soon</a>
+      </div>
+    </header>
+
+    <!-- FEATURES -->
+    <section>
+      <div class="grid">
+
+        <div class="card">
+          <h3>Use your own supplier pricing</h3>
+          <p>
+            Keep your supplier price lists private and always up to date. When prices change, your quotes update automatically.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Build quotes faster</h3>
+          <p>
+            Search materials, add quantities, and let AI read drawings, PDFs, or spreadsheets to generate your quote.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Send and track instantly</h3>
+          <p>
+            Send quotes to customers with a secure link. Get notified when they accept, request changes, or decline.
+          </p>
+        </div>
+
+      </div>
+    </section>
+<section>
+  <h2 class="sub-header">Built for work on the go</h2>
+
+  <p class="subtitle">
+    Whether you're on-site, in the van, or between jobs — create, adjust, and send quotes without slowing down.
+  </p>
+
+  <div class="grid" style="margin-top:2rem;">
+
+    <div class="card">
+      <h3>Quote from anywhere</h3>
+      <p>
+        Open a job, check materials, and build a quote right from your phone — no office needed.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Turn drawings into quotes</h3>
+      <p>
+        Upload a photo, PDF, or plan and let AI do the heavy lifting while you're still on site.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Send before you leave</h3>
+      <p>
+        Finish the job, send the quote, and get customer feedback before you even get back in the van.
+      </p>
+    </div>
+
+  </div>
+</section>
+   
+    <!-- TRUST / INFRA -->
+    <section>
+      <h2 class="sub-header">Built for reliability</h2>
+      <p class="subtitle" style="text-align:left; margin-top:1rem;">
+        Each company’s data is securely isolated. The platform is powered by modern cloud infrastructure and AI designed to keep costs low and performance high.
+      </p>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      © 2026 Quote Vector. All rights reserved.
+    </footer>
+
+  </div>
+
+</body>
+</html>
