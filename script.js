@@ -35,7 +35,10 @@ function setLanguage(lang) {
 function t(key) {
   var map = {
     en: {
-      "error.required": "Please fill in all required fields.",
+      "error.required.name": "Please enter your name.",
+      "error.required.email": "Please enter your email address.",
+      "error.required.companyType": "Please select your trade.",
+      "error.required.builderType": "Please select your builder type.",
       "error.email": "Please enter a valid email address.",
       "error.turnstile": "Please complete the verification step.",
       "error.turnstileDomain": "Turnstile rejected this domain. Add this hostname to your Cloudflare Turnstile widget settings.",
@@ -45,7 +48,10 @@ function t(key) {
       "submit": "Apply for Early Access"
     },
     sv: {
-      "error.required": "Vänligen fyll i alla obligatoriska fält.",
+      "error.required.name": "Vänligen ange ditt namn.",
+      "error.required.email": "Vänligen ange din e-postadress.",
+      "error.required.companyType": "Vänligen välj din bransch.",
+      "error.required.builderType": "Vänligen välj din byggartyp.",
       "error.email": "Vänligen ange en giltig e-postadress.",
       "error.turnstile": "Vänligen slutför verifieringen.",
       "error.turnstileDomain": "Turnstile avvisade denna domän. Lägg till värdnamnet i inställningarna för din Cloudflare Turnstile-widget.",
@@ -75,6 +81,7 @@ function initForm() {
   var submitting = false;
   var turnstileSiteKey = siteKeyMeta ? siteKeyMeta.getAttribute("content") : "";
   var turnstileReady = false;
+  var errorTimer = null;
 
   submitBtn.disabled = true;
 
@@ -127,8 +134,23 @@ function initForm() {
     var companyType = form.elements.companyType.value;
     var builderType = form.elements.builderType.value;
 
-    if (!name || !email || !companyType || !builderType) {
-      showError(t("error.required"));
+    if (!name) {
+      showError(t("error.required.name"));
+      return;
+    }
+
+    if (!email) {
+      showError(t("error.required.email"));
+      return;
+    }
+
+    if (!companyType) {
+      showError(t("error.required.companyType"));
+      return;
+    }
+
+    if (!builderType) {
+      showError(t("error.required.builderType"));
       return;
     }
 
@@ -187,11 +209,22 @@ function initForm() {
   }
 
   function showError(msg) {
+    if (errorTimer) {
+      clearTimeout(errorTimer);
+      errorTimer = null;
+    }
     errorEl.textContent = msg;
     errorEl.classList.remove("hidden");
+    errorTimer = window.setTimeout(function () {
+      hideError();
+    }, 4000);
   }
 
   function hideError() {
+    if (errorTimer) {
+      clearTimeout(errorTimer);
+      errorTimer = null;
+    }
     errorEl.classList.add("hidden");
   }
 }
