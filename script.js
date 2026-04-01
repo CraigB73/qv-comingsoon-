@@ -38,6 +38,7 @@ function t(key) {
       "error.required": "Please fill in all required fields.",
       "error.email": "Please enter a valid email address.",
       "error.turnstile": "Please complete the verification step.",
+      "error.turnstileDomain": "Turnstile rejected this domain. Add this hostname to your Cloudflare Turnstile widget settings.",
       "error.config": "Turnstile is not configured yet. Add your site key before going live.",
       "error.send": "Something went wrong. Please try again.",
       "sending": "Sending...",
@@ -47,6 +48,7 @@ function t(key) {
       "error.required": "Vänligen fyll i alla obligatoriska fält.",
       "error.email": "Vänligen ange en giltig e-postadress.",
       "error.turnstile": "Vänligen slutför verifieringen.",
+      "error.turnstileDomain": "Turnstile avvisade denna domän. Lägg till värdnamnet i inställningarna för din Cloudflare Turnstile-widget.",
       "error.config": "Turnstile är inte konfigurerat ännu. Lägg till din site key innan lansering.",
       "error.send": "Något gick fel. Försök igen.",
       "sending": "Skickar...",
@@ -72,10 +74,35 @@ function initForm() {
   var turnstileWidget = form.querySelector(".cf-turnstile");
   var submitting = false;
   var turnstileSiteKey = siteKeyMeta ? siteKeyMeta.getAttribute("content") : "";
+  var turnstileReady = false;
+
+  submitBtn.disabled = true;
 
   if (turnstileWidget) {
     turnstileWidget.setAttribute("data-sitekey", turnstileSiteKey || "");
   }
+
+  window.onTurnstileSuccess = function () {
+    turnstileReady = true;
+    hideError();
+    if (!submitting) submitBtn.disabled = false;
+  };
+
+  window.onTurnstileExpired = function () {
+    turnstileReady = false;
+    submitBtn.disabled = true;
+    showError(t("error.turnstile"));
+  };
+
+  window.onTurnstileError = function (code) {
+    turnstileReady = false;
+    submitBtn.disabled = true;
+    if (String(code || "") === "110200") {
+      showError(t("error.turnstileDomain"));
+      return;
+    }
+    showError(t("error.turnstile"));
+  };
 
   function updateMessageCounter() {
     if (!messageEl || !messageCounter) return;
@@ -115,7 +142,7 @@ function initForm() {
       return;
     }
 
-    if (!form.elements["cf-turnstile-response"] || !form.elements["cf-turnstile-response"].value) {
+    if (!turnstileReady || !form.elements["cf-turnstile-response"] || !form.elements["cf-turnstile-response"].value) {
       showError(t("error.turnstile"));
       return;
     }
@@ -152,7 +179,7 @@ function initForm() {
 
   function resetSubmit() {
     submitBtn.textContent = t("submit");
-    submitBtn.disabled = false;
+    submitBtn.disabled = !turnstileReady;
     submitting = false;
     if (window.turnstile && typeof window.turnstile.reset === "function" && turnstileWidget) {
       window.turnstile.reset(turnstileWidget);

@@ -225,12 +225,16 @@ testa och forma plattformen."></p>
           <div class="cf-turnstile"
                data-sitekey="0x4AAAAAACzCvZbd_c6Shmsi"
                data-theme="dark"
-               data-size="flexible"></div>
+               data-size="flexible"
+               data-callback="onTurnstileSuccess"
+               data-error-callback="onTurnstileError"
+               data-expired-callback="onTurnstileExpired"></div>
         </div>
 
         <div id="form-error" class="form-error hidden"></div>
 
         <button type="submit" class="btn-submit" id="submitBtn"
+                disabled
                 data-en="Apply for Early Access"
                 data-se="Ansök om tidig tillgång">Apply for Early Access</button>
       </form>
