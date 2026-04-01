@@ -77,6 +77,7 @@ function initForm() {
   var submitBtn = document.getElementById("submitBtn");
   var messageEl = document.getElementById("message");
   var messageCounter = document.getElementById("messageCounter");
+  var phoneEl = document.getElementById("phone");
   var turnstileWidget = form.querySelector(".cf-turnstile");
   var submitting = false;
   var turnstileSiteKey = siteKeyMeta ? siteKeyMeta.getAttribute("content") : "";
@@ -121,6 +122,55 @@ function initForm() {
   if (messageEl && messageCounter) {
     messageEl.addEventListener("input", updateMessageCounter);
     updateMessageCounter();
+  }
+
+  function formatPhoneValue(value) {
+    var raw = String(value || "").trim();
+    if (!raw) return "";
+
+    var normalized = raw.replace(/[^\d+]/g, "");
+    if (normalized.indexOf("00") === 0) {
+      normalized = "+" + normalized.slice(2);
+    }
+
+    if (normalized.charAt(0) !== "+") {
+      normalized = normalized.charAt(0) === "0"
+        ? "+46" + normalized.slice(1)
+        : "+46" + normalized;
+    }
+
+    var digits = "+" + normalized.slice(1).replace(/\D/g, "");
+    var ccMatch = digits.match(/^\+(\d{1,3})(\d*)$/);
+    if (!ccMatch) return digits;
+
+    var countryCode = ccMatch[1];
+    var rest = ccMatch[2];
+    var groups = [];
+
+    while (rest.length > 3) {
+      groups.push(rest.slice(0, 3));
+      rest = rest.slice(3);
+    }
+
+    if (rest) groups.push(rest);
+    return "+" + countryCode + (groups.length ? " " + groups.join(" ") : "");
+  }
+
+  if (phoneEl) {
+    phoneEl.addEventListener("focus", function () {
+      if (!phoneEl.value.trim()) {
+        phoneEl.value = "+46 ";
+      }
+    });
+
+    phoneEl.addEventListener("input", function () {
+      phoneEl.value = formatPhoneValue(phoneEl.value);
+    });
+
+    phoneEl.addEventListener("blur", function () {
+      var formatted = formatPhoneValue(phoneEl.value);
+      phoneEl.value = formatted === "+46" ? "" : formatted;
+    });
   }
 
   form.addEventListener("submit", function (e) {
