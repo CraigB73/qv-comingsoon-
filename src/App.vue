@@ -4,8 +4,9 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 // ---------------------------------------------------------------------------
 // Config (injected via meta tags in index.html)
 // ---------------------------------------------------------------------------
-const TURNSTILE_SITE_KEY = ref("");
+const TURNSTILE_SITE_KEY = ref("0x4AAAAAACzCvZbd_c6Shmsi");
 const EDGE_FUNCTION_URL = ref("");
+const SUPABASE_ANON_KEY = ref("");
 
 // ---------------------------------------------------------------------------
 // State
@@ -387,7 +388,7 @@ async function submitForm() {
   // Turnstile
   if (
     !TURNSTILE_SITE_KEY.value ||
-    TURNSTILE_SITE_KEY.value === "YOUR_TURNSTILE_SITE_KEY"
+    TURNSTILE_SITE_KEY.value === "0x4AAAAAACzCvZbd_c6Shmsi"
   ) {
     return setError(t.value.errors.config);
   }
@@ -420,7 +421,11 @@ async function submitForm() {
   try {
     const res = await fetch(EDGE_FUNCTION_URL.value, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY.value}`,
+        "apikey": SUPABASE_ANON_KEY.value,
+      },
       body: JSON.stringify(payload),
     });
 
@@ -456,6 +461,9 @@ onMounted(() => {
   const edgeMeta = document.querySelector('meta[name="edge-function-url"]');
   EDGE_FUNCTION_URL.value =
     edgeMeta?.getAttribute("content") ?? "/functions/v1/submit-lead";
+
+  const anonMeta = document.querySelector('meta[name="supabase-anon-key"]');
+  SUPABASE_ANON_KEY.value = anonMeta?.getAttribute("content") ?? "";
 
   // Language
   const saved = localStorage.getItem("qv-lang");
