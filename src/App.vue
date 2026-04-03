@@ -21,6 +21,8 @@ const showScrollIndicator = ref(true);
 const lastSubmitTime = ref(0);
 const COOLDOWN_MS = 10_000;
 const videoEnded = ref(false);
+const showPrivacyPolicy = ref(false);
+const showDuplicateModal = ref(false);
 
 const turnstileContainer = ref(null);
 const videoRef = ref(null);
@@ -150,9 +152,16 @@ const copy = {
         "Turnstile is not configured. Add your site key before going live.",
       cooldown: "Please wait a moment before submitting again.",
       duplicate: "This email has already been registered.",
+      duplicateTitle: "Already Registered",
+      duplicateBody: "This email address has already been submitted. You'll hear from us before we go live — no need to sign up again.",
+      duplicateClose: "Got it",
       rateLimit: "Too many submissions. Please try again later.",
       send: "Something went wrong. Please try again.",
     },
+    privacyLink: "Data Privacy Policy",
+    privacyTitle: "Data Privacy Policy",
+    privacyBody: `We collect your name, company details, email, phone number, and quoting preferences solely to evaluate your interest in Quote Vector and to contact you about early access.\n\nYour data is stored securely in our database and is only accessible to the Quote Vector platform team.\n\nWe do not share, sell, or transfer your personal information to third parties.\n\nOnce quotevector.com goes live, all personal information belonging to users who do not become active subscribers will be permanently deleted from our database.\n\nBy submitting this form, you consent to the collection and use of your data as described above.\n\nIf you have questions about your data, contact us at privacy@quotevector.com.`,
+    privacyClose: "Close",
   },
   sv: {
     switchLabel: "Switch to English",
@@ -255,9 +264,16 @@ const copy = {
         "Turnstile är inte konfigurerat ännu. Lägg till din site key innan lansering.",
       cooldown: "Vänta en stund innan du skickar igen.",
       duplicate: "Denna e-postadress har redan registrerats.",
+      duplicateTitle: "Redan registrerad",
+      duplicateBody: "Denna e-postadress har redan skickats in. Du kommer att höra från oss innan vi lanserar — du behöver inte registrera dig igen.",
+      duplicateClose: "Uppfattat",
       rateLimit: "För många inskickningar. Försök igen senare.",
       send: "Något gick fel. Försök igen.",
     },
+    privacyLink: "Integritetspolicy",
+    privacyTitle: "Integritetspolicy",
+    privacyBody: `Vi samlar in ditt namn, företagsuppgifter, e-post, telefonnummer och offertvanor enbart för att bedöma ditt intresse för Quote Vector och för att kontakta dig om tidig åtkomst.\n\nDin data lagras säkert i vår databas och är endast tillgänglig för Quote Vectors plattformsteam.\n\nVi delar, säljer eller överför inte din personliga information till tredje part.\n\nNär quotevector.com lanseras kommer all personlig information som tillhör användare som inte blir aktiva prenumeranter att permanent raderas från vår databas.\n\nGenom att skicka in detta formulär samtycker du till insamling och användning av dina uppgifter enligt ovan.\n\nHar du frågor om dina uppgifter, kontakta oss på privacy@quotevector.com.`,
+    privacyClose: "Stäng",
   },
 };
 
@@ -430,7 +446,10 @@ async function submitForm() {
       const data = await res.json().catch(() => null);
       const errMsg = data?.error || t.value.errors.send;
 
-      if (res.status === 409) throw new Error(t.value.errors.duplicate);
+      if (res.status === 409) {
+        showDuplicateModal.value = true;
+        return;
+      }
       if (res.status === 429) throw new Error(t.value.errors.rateLimit);
       throw new Error(errMsg);
     }
@@ -803,6 +822,12 @@ onBeforeUnmount(() => {
           >
             {{ submitting ? t.sending : t.submit }}
           </button>
+
+          <p class="form-privacy-link">
+            <a href="#" @click.prevent="showPrivacyPolicy = true">
+              {{ t.privacyLink }}
+            </a>
+          </p>
         </form>
 
         <!-- Success state -->
@@ -873,6 +898,35 @@ onBeforeUnmount(() => {
       <span>{{ t.legal }}</span>
     </p>
   </footer>
+
+  <!-- ====== PRIVACY POLICY MODAL ====== -->
+  <Teleport to="body">
+    <div v-if="showPrivacyPolicy" class="modal-overlay" @click.self="showPrivacyPolicy = false">
+      <div class="modal-card">
+        <h2 class="modal-title">{{ t.privacyTitle }}</h2>
+        <div class="modal-body">
+          <p v-for="(para, i) in t.privacyBody.split('\\n\\n')" :key="i">{{ para }}</p>
+        </div>
+        <button class="modal-close-btn" @click="showPrivacyPolicy = false">
+          {{ t.privacyClose }}
+        </button>
+      </div>
+    </div>
+  </Teleport>
+
+  <!-- ====== DUPLICATE EMAIL MODAL ====== -->
+  <Teleport to="body">
+    <div v-if="showDuplicateModal" class="modal-overlay" @click.self="showDuplicateModal = false">
+      <div class="modal-card modal-card--duplicate">
+        <div class="modal-icon">&#9888;</div>
+        <h2 class="modal-title">{{ t.errors.duplicateTitle }}</h2>
+        <p class="modal-body-text">{{ t.errors.duplicateBody }}</p>
+        <button class="modal-close-btn" @click="showDuplicateModal = false">
+          {{ t.errors.duplicateClose }}
+        </button>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <style>
@@ -2152,5 +2206,105 @@ button {
   .card {
     min-height: clamp(126px, 12vw, 146px);
   }
+}
+/* ============================================================= */
+/* PRIVACY LINK                                                   */
+/* ============================================================= */
+.form-privacy-link {
+  margin: 10px 0 0;
+  text-align: center;
+  font-size: 0.7rem;
+}
+
+.form-privacy-link a {
+  color: rgba(249, 251, 255, 0.7);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.form-privacy-link a:hover {
+  color: #f9fbff;
+}
+
+/* ============================================================= */
+/* MODALS                                                         */
+/* ============================================================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(8, 12, 22, 0.8);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.modal-card {
+  width: min(100%, 480px);
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 24px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #1a2033, #141b2a);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  color: #e8eaf2;
+}
+
+.modal-card--duplicate {
+  text-align: center;
+  max-height: none;
+}
+
+.modal-icon {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  color: #f59e0b;
+}
+
+.modal-title {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f4f5fb;
+}
+
+.modal-body p {
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #c4c8d8;
+}
+
+.modal-body p:last-child {
+  margin-bottom: 0;
+}
+
+.modal-body-text {
+  margin: 0 0 20px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #c4c8d8;
+}
+
+.modal-close-btn {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #20bf63, #149649);
+  color: #f7fff9;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modal-close-btn:hover {
+  filter: brightness(1.04);
 }
 </style>
