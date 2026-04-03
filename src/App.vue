@@ -387,7 +387,7 @@ async function submitForm() {
   // Turnstile
   if (
     !TURNSTILE_SITE_KEY.value ||
-    TURNSTILE_SITE_KEY.value === "0x4AAAAAACzCvZbd_c6Shmsi"
+    TURNSTILE_SITE_KEY.value === "YOUR_TURNSTILE_SITE_KEY"
   ) {
     return setError(t.value.errors.config);
   }
